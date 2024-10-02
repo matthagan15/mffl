@@ -8,7 +8,16 @@ use crate::math::{
     group_ring_field::Ring,
 };
 
-// TODO: Should I implement a Compressed Sparse Row version of this?
+/// Stores the matrix elements as edge weights in a bipartite graph. The nodes of
+/// the graph is R for row index nodes and C for col index nodes. Then an edge between
+/// r_i and c_j constitutes a matrix element A_{i, j}. This allows for storing the data
+/// in the matrix only once but allows for constant time access to neighboring entries within a
+/// column or row.
+///
+/// Currently this data structure is insanely slow, I believe it's because of the internals
+/// of `mhgl` used to compute links. Currently each link needs a few hash table lookups
+/// which cant be cheap. Need to see if converting `mhgl` to using Rc's or some kind of pointer
+/// scheme to store containing edges speeds this up at all.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SparseSparseFFMatrix {
     row_nodes: FxHashMap<usize, u32>,
